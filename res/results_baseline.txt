@@ -1,0 +1,22 @@
+Using device: cuda
+
+--- Training Task A (Classes 0-13) ---
+Epoch 1, Loss: 0.5825
+Epoch 2, Loss: 0.2839
+Epoch 3, Loss: 0.2785
+Accuracy on Task A: 0.9459
+
+--- Training Task B (Classes 14-27) ---
+Epoch 1, Loss: 3.8122
+Epoch 2, Loss: 0.7062
+Epoch 3, Loss: 0.5971
+Accuracy on Task A: 0.1945
+Accuracy on Task B: 0.9136
+
+--- Training Task C (Classes 28-40) ---
+Epoch 1, Loss: 12.1763
+Epoch 2, Loss: 1.1615
+Epoch 3, Loss: 0.9374
+Accuracy on Task A: 0.1982
+Accuracy on Task B: 0.1471
+Accuracy on Task C: 0.8789
