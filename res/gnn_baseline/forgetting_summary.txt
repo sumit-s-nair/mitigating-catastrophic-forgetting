@@ -1,0 +1,72 @@
+=================================================================
+GNN NODE CLASSIFICATION — CATASTROPHIC FORGETTING BASELINE
+Research-Grade Results
+=================================================================
+
+CONFIGURATION
+----------------------------------------
+  Model:          GAT (2-layer, 4 heads, 128 hidden)
+  Features:       TF-IDF (512 dims)
+  Epochs/round:   60
+  Learning rate:  0.005
+  Seeds:          [42, 123, 456, 789, 1024]
+  Loss:           CrossEntropy with class weights
+
+DATA
+----------------------------------------
+  Total nodes:    41309
+  Total edges:    54865
+  Comment counts per subreddit:
+          python: 5801
+     learnpython: 5007
+          django: 5651
+      javascript: 2248
+            node: 5695
+          webdev: 3465
+  Edge relations:
+    authored : user → comment  (26981 edges)
+    on_post  : comment → post  (27867 edges)
+    reply_to : comment → comment (17 edges)
+  Class weights: ['0.709', '0.822', '0.728', '1.831', '0.722', '1.187']
+
+NAIVE SEQUENTIAL — GAT
+----------------------------------------
+         r1_python_acc: 0.9687 ± 0.0036
+         r2_python_acc: 0.0044 ± 0.0048
+             r2_js_acc: 0.8944 ± 0.0308
+            forgetting: 0.9643 ± 0.0048
+  Per-class (final):
+          python: 0.0000 ± 0.0000
+     learnpython: 0.0000 ± 0.0000
+          django: 0.0127 ± 0.0138
+      javascript: 0.8889 ± 0.0566
+            node: 0.8841 ± 0.0220
+          webdev: 0.9149 ± 0.0443
+
+NAIVE SEQUENTIAL — MLP (ablation)
+----------------------------------------
+         r1_python_acc: 0.5894 ± 0.0039
+         r2_python_acc: 0.0002 ± 0.0005
+             r2_js_acc: 0.6001 ± 0.0086
+            forgetting: 0.5892 ± 0.0041
+  Per-class (final):
+          python: 0.0000 ± 0.0000
+     learnpython: 0.0000 ± 0.0000
+          django: 0.0007 ± 0.0014
+      javascript: 0.5547 ± 0.0198
+            node: 0.5749 ± 0.0166
+          webdev: 0.6710 ± 0.0146
+
+JOINT TRAINING — GAT (upper bound)
+----------------------------------------
+            python_acc: 0.9495 ± 0.0050
+                js_acc: 0.9422 ± 0.0110
+  Per-class (final):
+          python: 0.9387 ± 0.0100
+     learnpython: 0.9541 ± 0.0074
+          django: 0.9567 ± 0.0058
+      javascript: 0.9453 ± 0.0172
+            node: 0.9313 ± 0.0125
+          webdev: 0.9579 ± 0.0117
+
+=================================================================

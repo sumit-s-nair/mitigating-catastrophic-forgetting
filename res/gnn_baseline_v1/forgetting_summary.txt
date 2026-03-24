@@ -1,0 +1,34 @@
+============================================================
+GNN NODE CLASSIFICATION — CATASTROPHIC FORGETTING BASELINE
+============================================================
+Model:            GAT (2-layer, 4 heads, 128 hidden)
+Features:         TF-IDF (512 dims)
+Epochs/round:     20
+Learning rate:    0.005
+
+ROUND 1 — Trained on Python subreddits
+----------------------------------------
+  [✓]       python: 0.8365
+  [✓]  learnpython: 0.7864
+  [✓]       django: 0.9365
+  [ ]   javascript: 0.0000
+  [ ]         node: 0.0000
+  [ ]       webdev: 0.0000
+
+ROUND 2 — Fine-tuned on JS subreddits
+----------------------------------------
+  [ ]       python: 0.0000
+  [ ]  learnpython: 0.0000
+  [ ]       django: 0.0009
+  [✓]   javascript: 0.2065
+  [✓]         node: 1.0000
+  [✓]       webdev: 0.0908
+
+FORGETTING METRICS
+----------------------------------------
+  Python acc (after R1): 0.8546
+  Python acc (after R2): 0.0003
+  JS acc (after R2):     0.5671
+  Forgetting magnitude:  0.8543 (85.4%)
+
+============================================================

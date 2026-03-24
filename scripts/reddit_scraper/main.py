@@ -479,16 +479,16 @@ def save_graphml(nodes_df: pd.DataFrame, edges_df: pd.DataFrame, out_file: Path)
 
 
 def main() -> None:
-    target_subreddit = "Python"
+    target_subreddit = "javascript"
     out_dir = Path("data")
     out_dir.mkdir(parents=True, exist_ok=True)
 
-    raw_comments_file = out_dir / "python_gnn_comments_raw.csv"
-    nodes_file = out_dir / "python_gnn_nodes.csv"
-    edges_file = out_dir / "python_gnn_edges.csv"
-    meta_file = out_dir / "python_gnn_metadata.json"
-    graphml_file = out_dir / "python_gnn.graphml"
-    checked_posts_file = out_dir / "python_gnn_checked_posts.csv"
+    raw_comments_file = out_dir / "javascript_gnn_comments_raw.csv"
+    nodes_file = out_dir / "javascript_gnn_nodes.csv"
+    edges_file = out_dir / "javascript_gnn_edges.csv"
+    meta_file = out_dir / "javascript_gnn_metadata.json"
+    graphml_file = out_dir / "javascript_gnn.graphml"
+    checked_posts_file = out_dir / "javascript_gnn_checked_posts.csv"
 
     existing_comments_df = load_existing_comments(raw_comments_file=raw_comments_file, subreddit=target_subreddit)
     bootstrap_full_scrape = existing_comments_df.empty
@@ -611,7 +611,7 @@ def main() -> None:
     print(f"Saved metadata: {meta_file}")
     print(f"Saved graphml: {graphml_file}")
     print(f"Saved checked posts: {checked_posts_file}")
-    print("This graph contains nodes and edges only from r/RDR2, incrementally updated.")
+    print("This graph contains nodes and edges only from r/javascript, incrementally updated.")
 
 
 if __name__ == "__main__":
