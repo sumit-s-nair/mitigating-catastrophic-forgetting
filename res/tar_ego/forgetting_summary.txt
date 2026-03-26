@@ -1,0 +1,40 @@
+=================================================================
+TOPOLOGY-AWARE REPLAY — EGO-SUBGRAPH SELECTION
+=================================================================
+
+Hub Count: 100 (total nodes: 100 ± 0)
+----------------------------------------
+         r1_python_acc: 0.9687 ± 0.0036
+         r2_python_acc: 0.1316 ± 0.0419
+             r2_js_acc: 0.9092 ± 0.0236
+            forgetting: 0.8370 ± 0.0426
+        recovery_ratio: 0.1346 ± 0.0443
+            plasticity: 0.9650 ± 0.0250
+
+Hub Count: 500 (total nodes: 500 ± 0)
+----------------------------------------
+         r1_python_acc: 0.9687 ± 0.0036
+         r2_python_acc: 0.4558 ± 0.0323
+             r2_js_acc: 0.9166 ± 0.0208
+            forgetting: 0.5129 ± 0.0330
+        recovery_ratio: 0.4776 ± 0.0342
+            plasticity: 0.9728 ± 0.0221
+
+Hub Count: 1000 (total nodes: 1000 ± 0)
+----------------------------------------
+         r1_python_acc: 0.9687 ± 0.0036
+         r2_python_acc: 0.5491 ± 0.0047
+             r2_js_acc: 0.9161 ± 0.0194
+            forgetting: 0.4196 ± 0.0073
+        recovery_ratio: 0.5764 ± 0.0050
+            plasticity: 0.9723 ± 0.0206
+
+Hub Count: 2000 (total nodes: 2000 ± 0)
+----------------------------------------
+         r1_python_acc: 0.9687 ± 0.0036
+         r2_python_acc: 0.5811 ± 0.0058
+             r2_js_acc: 0.9148 ± 0.0204
+            forgetting: 0.3876 ± 0.0074
+        recovery_ratio: 0.6102 ± 0.0062
+            plasticity: 0.9709 ± 0.0216
+

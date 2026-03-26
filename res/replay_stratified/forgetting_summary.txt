@@ -1,0 +1,40 @@
+=================================================================
+EXPERIENCE REPLAY — STRATIFIED BUFFER SELECTION
+=================================================================
+
+Buffer Size: 100
+----------------------------------------
+         r1_python_acc: 0.9687 ± 0.0036
+         r2_python_acc: 0.6372 ± 0.0113
+             r2_js_acc: 0.9178 ± 0.0193
+            forgetting: 0.3315 ± 0.0084
+        recovery_ratio: 0.6695 ± 0.0119
+            plasticity: 0.9741 ± 0.0205
+
+Buffer Size: 500
+----------------------------------------
+         r1_python_acc: 0.9687 ± 0.0036
+         r2_python_acc: 0.8462 ± 0.0119
+             r2_js_acc: 0.9180 ± 0.0185
+            forgetting: 0.1225 ± 0.0130
+        recovery_ratio: 0.8907 ± 0.0126
+            plasticity: 0.9743 ± 0.0196
+
+Buffer Size: 1000
+----------------------------------------
+         r1_python_acc: 0.9687 ± 0.0036
+         r2_python_acc: 0.8880 ± 0.0151
+             r2_js_acc: 0.9127 ± 0.0205
+            forgetting: 0.0807 ± 0.0175
+        recovery_ratio: 0.9349 ± 0.0160
+            plasticity: 0.9687 ± 0.0218
+
+Buffer Size: 2000
+----------------------------------------
+         r1_python_acc: 0.9687 ± 0.0036
+         r2_python_acc: 0.9152 ± 0.0123
+             r2_js_acc: 0.9143 ± 0.0183
+            forgetting: 0.0535 ± 0.0153
+        recovery_ratio: 0.9637 ± 0.0130
+            plasticity: 0.9704 ± 0.0194
+
