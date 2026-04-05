@@ -1,0 +1,43 @@
+{
+  "metrics": {
+    "node_degree_mean": 1.5768595933914185,
+    "node_degree_std": 0.4940674602985382,
+    "node_degree_min": 1,
+    "node_degree_max": 2,
+    "hyperedge_size_mean": 6.335652828216553,
+    "hyperedge_size_std": 7.2008233070373535,
+    "hyperedge_size_min": 2,
+    "hyperedge_size_max": 50,
+    "label_neighbor_density": 1.0,
+    "bipartite_score": 0.37409502267837524,
+    "num_nodes": 24252,
+    "num_hyperedges": 6036,
+    "num_incidences": 38242,
+    "per_type_density": {
+      "thread": 1.0,
+      "user": 1.0
+    }
+  },
+  "predictions": [
+    {
+      "method": "TAR (Hypergraph)",
+      "verdict": "LIKELY TO FAIL",
+      "reasoning": "Flat centrality distribution (degree std=0.49 < 1.5). Cannot meaningfully distinguish hub nodes from periphery. This mirrors the bipartite Reddit graph result where TAR failed because degree distribution was too uniform."
+    },
+    {
+      "method": "Random Replay",
+      "verdict": "LIKELY TO MAINTAIN CLASS DIVERSITY",
+      "reasoning": "High label-neighbor density (1.00 > 0.4) \u2014 nodes sharing hyperedges tend to share labels, so replaying nodes preserves community structure."
+    },
+    {
+      "method": "LwF / Standard EWC",
+      "verdict": "REASONABLE BASELINE",
+      "reasoning": "Non-trivial hypergraph structure (bipartite score=0.37). Topology-agnostic methods serve as baseline; structure-aware methods may outperform."
+    },
+    {
+      "method": "HypergraphEWC",
+      "verdict": "WORTH TRYING (NOVEL)",
+      "reasoning": "Novel contribution: structure-aware Fisher weighting by hyperedge participation. Even with flat degree distribution, the size-normalized weighting (|e|^{-1}) may capture important structural importance signals that standard EWC misses."
+    }
+  ]
+}
