@@ -1,0 +1,31 @@
+=================================================================
+HGNN NODE CLASSIFICATION — CATASTROPHIC FORGETTING BASELINE
+=================================================================
+
+CONFIGURATION
+----------------------------------------
+  Model:          HGNN
+  Hidden dim:     128
+  Features:       Sentence-Transformer (384 dims)
+  Epochs/task:    50
+  Learning rate:  0.005
+  Seeds:          [42, 123, 456, 789, 1024]
+
+NAIVE SEQUENTIAL (FINETUNE)
+----------------------------------------
+            forgetting: 0.9055 ± 0.0047
+     backward_transfer: -0.9055 ± 0.0047
+      forward_transfer: 0.0000 ± 0.0000
+        recovery_ratio: 0.0021 ± 0.0008
+            plasticity: 0.7195 ± 0.0268
+                 A_1_1: 0.9074 ± 0.0042
+                 A_1_2: 0.0000 ± 0.0000
+                 A_2_1: 0.0019 ± 0.0008
+                 A_2_2: 0.7195 ± 0.0268
+
+JOINT TRAINING (UPPER BOUND)
+----------------------------------------
+                t1_acc: 0.9106 ± 0.0054
+                t2_acc: 0.8808 ± 0.0070
+
+=================================================================
