@@ -272,14 +272,31 @@ def main():
         json.dump(json_data, f, indent=2, default=str)
     print(f"  ✓ experiment_results.json")
 
-    # Comparison bar chart
-    plot_results(all_summaries, FULL_DIR / "method_comparison.png",
+    # Comparison bar chart (exclude HypergraphEWC; include joint upper bound)
+    plot_summaries = {
+        name: summary for name, summary in all_summaries.items()
+        if name != "HypergraphEWC"
+    }
+    plot_summaries["Joint (UB)"] = {
+        "forgetting": {"mean": 0.0, "std": 0.0},
+        "recovery_ratio": {"mean": 1.0, "std": 0.0},
+        "plasticity": joint_summary.get("t2_acc", {"mean": 0.0, "std": 0.0}),
+        "A_2_1": joint_summary.get("t1_acc", {"mean": 0.0, "std": 0.0}),
+        "A_2_2": joint_summary.get("t2_acc", {"mean": 0.0, "std": 0.0}),
+    }
+
+    plot_results(plot_summaries, FULL_DIR / "method_comparison.png",
+                 title="HGNN CL Methods — Full Comparison")
+    plot_results(plot_summaries, FULL_DIR / "method_comparison.eps",
                  title="HGNN CL Methods — Full Comparison")
     print(f"  ✓ method_comparison.png")
+    print(f"  ✓ method_comparison.eps")
 
-    # Forgetting curves overlay
+    # Forgetting curves overlay (exclude HypergraphEWC)
     avg_histories = {}
     for method_name, _ in get_methods():
+        if method_name == "HypergraphEWC":
+            continue
         runs = all_results[method_name]
         if runs:
             E = config.EPOCHS_PER_TASK
@@ -287,9 +304,20 @@ def main():
             avg_histories[method_name] = {
                 "t1_acc": all_t1.mean(axis=0).tolist(),
             }
-    plot_forgetting_curves(avg_histories, FULL_DIR / "forgetting_curves.png",
-                           epochs_per_task=config.EPOCHS_PER_TASK)
+    plot_forgetting_curves(
+        avg_histories,
+        FULL_DIR / "forgetting_curves.png",
+        epochs_per_task=config.EPOCHS_PER_TASK,
+        upper_bound=joint_summary["t1_acc"]["mean"],
+    )
+    plot_forgetting_curves(
+        avg_histories,
+        FULL_DIR / "forgetting_curves.eps",
+        epochs_per_task=config.EPOCHS_PER_TASK,
+        upper_bound=joint_summary["t1_acc"]["mean"],
+    )
     print(f"  ✓ forgetting_curves.png")
+    print(f"  ✓ forgetting_curves.eps")
 
     # Summary table
     save_summary_table(all_summaries, joint_summary, FULL_DIR)

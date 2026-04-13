@@ -149,13 +149,15 @@ def plot_results(results_dict: Dict[str, dict], save_path: Path,
 
 
 def plot_forgetting_curves(histories: Dict[str, dict], save_path: Path,
-                           epochs_per_task: int = 50) -> None:
+                           epochs_per_task: int = 50,
+                           upper_bound: Optional[float] = None) -> None:
     """Overlay T1 accuracy curves for multiple methods.
 
     Args:
         histories: {method_name: {"t1_acc": [list], "t2_acc": [list]}}
         save_path: where to save
         epochs_per_task: number of epochs per task
+        upper_bound: optional horizontal reference line (e.g., joint-training T1 acc)
     """
     E = epochs_per_task
     all_epochs = list(range(1, 2 * E + 1))
@@ -168,6 +170,10 @@ def plot_forgetting_curves(histories: Dict[str, dict], save_path: Path,
         if len(t1_curve) == 2 * E:
             ax.plot(all_epochs, t1_curve, "-", color=colors[i],
                     linewidth=2, label=name)
+
+    if upper_bound is not None:
+        ax.axhline(y=upper_bound, color="gold", linestyle="--", linewidth=2,
+                   alpha=0.8, label="Joint upper bound")
 
     ax.axvline(x=E + 0.5, color="gray", linestyle="--", alpha=0.7)
     ax.text(E / 2, 1.05, "Task 1\n(Python)", ha="center", fontsize=11)
