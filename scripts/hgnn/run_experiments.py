@@ -98,8 +98,8 @@ def run_method(method_name, cl_method, data, class_weights, seed):
 def save_summary_table(all_summaries, joint_summary, save_dir):
     """Save a comparison summary as CSV and TXT."""
     methods = list(all_summaries.keys())
-    metrics_keys = ["forgetting", "recovery_ratio", "plasticity",
-                    "A_1_1", "A_2_1", "A_2_2"]
+    metrics_keys = ["avg_forgetting", "recovery_ratio", "plasticity", "avg_final_acc",
+                    "A_1_1", "A_3_1", "A_3_2", "A_3_3"]
 
     # CSV
     csv_path = save_dir / "comparison_table.csv"
@@ -118,13 +118,19 @@ def save_summary_table(all_summaries, joint_summary, save_dir):
 
         # Joint training row
         row = ["Joint (UB)"]
+        jt_t1  = joint_summary.get("t1_acc", {"mean": 0, "std": 0})
+        jt_t2  = joint_summary.get("t2_acc", {"mean": 0, "std": 0})
+        jt_t3  = joint_summary.get("t3_acc", {"mean": 0, "std": 0})
+        jt_avg = (jt_t1["mean"] + jt_t2["mean"] + jt_t3["mean"]) / 3
         jt_mapped = {
-            "forgetting": {"mean": 0.0, "std": 0.0},
-            "recovery_ratio": {"mean": 1.0, "std": 0.0},
-            "plasticity": joint_summary.get("t2_acc", {"mean": 0, "std": 0}),
-            "A_1_1": joint_summary.get("t1_acc", {"mean": 0, "std": 0}),
-            "A_2_1": joint_summary.get("t1_acc", {"mean": 0, "std": 0}),
-            "A_2_2": joint_summary.get("t2_acc", {"mean": 0, "std": 0}),
+            "avg_forgetting":  {"mean": 0.0,    "std": 0.0},
+            "recovery_ratio":  {"mean": 1.0,    "std": 0.0},
+            "plasticity":      jt_t3,
+            "avg_final_acc":   {"mean": jt_avg, "std": 0.0},
+            "A_1_1":           jt_t1,
+            "A_3_1":           jt_t1,
+            "A_3_2":           jt_t2,
+            "A_3_3":           jt_t3,
         }
         row += [f"{jt_mapped.get(k, {}).get('mean', 0):.4f}" for k in metrics_keys]
         row += [f"{jt_mapped.get(k, {}).get('std', 0):.4f}" for k in metrics_keys]
@@ -133,21 +139,21 @@ def save_summary_table(all_summaries, joint_summary, save_dir):
     # TXT
     txt_path = save_dir / "comparison_summary.txt"
     lines = [
-        "=" * 80,
-        "HGNN CATASTROPHIC FORGETTING — FULL EXPERIMENT COMPARISON",
-        "=" * 80, "",
+        "=" * 108,
+        "HGNN CATASTROPHIC FORGETTING — FULL EXPERIMENT COMPARISON (3-task)",
+        "=" * 108, "",
         f"Model:       {config.MODEL_TYPE}",
         f"Hidden:      {config.HIDDEN_DIM}",
         f"Epochs/task: {config.EPOCHS_PER_TASK}",
         f"Seeds:       {config.SEEDS}", "",
-        f"{'Method':<20} {'Fgt↓':>8} {'Recov↑':>8} {'Plast↑':>8} "
-        f"{'A11':>8} {'A21':>8} {'A22':>8}",
-        "-" * 80,
+        f"{'Method':<20} {'AvgFgt↓':>9} {'Recov↑':>8} {'Plast↑':>8} "
+        f"{'AvgAcc↑':>8} {'A11':>8} {'A31':>8} {'A32':>8} {'A33':>8}",
+        "-" * 108,
     ]
     for method in methods:
         s = all_summaries[method]
         vals = [s.get(k, {}).get("mean", 0) for k in metrics_keys]
-        stds = [s.get(k, {}).get("std", 0) for k in metrics_keys]
+        stds = [s.get(k, {}).get("std",  0) for k in metrics_keys]
         line = f"{method:<20}"
         for v, sd in zip(vals, stds):
             line += f" {v:>5.3f}±{sd:.3f}"
@@ -160,9 +166,9 @@ def save_summary_table(all_summaries, joint_summary, save_dir):
         joint_line += f" {mv.get('mean', 0):>5.3f}±{mv.get('std', 0):.3f}"
     lines.append(joint_line)
 
-    lines.extend(["", "=" * 80])
+    lines.extend(["", "=" * 108])
 
-    with open(txt_path, "w") as f:
+    with open(txt_path, "w", encoding="utf-8") as f:
         f.write("\n".join(lines) + "\n")
 
 
@@ -203,7 +209,7 @@ def main():
         )
         result_jt = run_joint_training(model_jt, data, class_weights, config, seed)
         all_results["Joint"].append(result_jt)
-        print(f"    → T1: {result_jt['t1_acc']:.4f}  T2: {result_jt['t2_acc']:.4f}")
+        print(f"    → T1: {result_jt['t1_acc']:.4f}  T2: {result_jt['t2_acc']:.4f}  T3: {result_jt['t3_acc']:.4f}")
 
         # ─── CL Methods ─────────────────────────────────────────
         methods = get_methods()
@@ -214,9 +220,10 @@ def main():
             all_results[method_name].append(result)
 
             m = result["metrics"]
-            print(f"    → T1: {result['r2_t1_acc']:.4f}  "
-                  f"T2: {result['r2_t2_acc']:.4f}  "
-                  f"Forgetting: {m['forgetting']:.4f}  "
+            print(f"    → T1: {result['r3_t1_acc']:.4f}  "
+                  f"T2: {result['r3_t2_acc']:.4f}  "
+                  f"T3: {result['r3_t3_acc']:.4f}  "
+                  f"Avg Fgt: {m['avg_forgetting']:.4f}  "
                   f"Recovery: {m['recovery_ratio']:.4f}")
 
     # ─── Aggregate ───────────────────────────────────────────────
@@ -238,9 +245,11 @@ def main():
 
     joint_summary = {
         "t1_acc": {"mean": float(np.mean([r["t1_acc"] for r in all_results["Joint"]])),
-                   "std": float(np.std([r["t1_acc"] for r in all_results["Joint"]]))},
+                   "std":  float(np.std( [r["t1_acc"] for r in all_results["Joint"]]))},
         "t2_acc": {"mean": float(np.mean([r["t2_acc"] for r in all_results["Joint"]])),
-                   "std": float(np.std([r["t2_acc"] for r in all_results["Joint"]]))},
+                   "std":  float(np.std( [r["t2_acc"] for r in all_results["Joint"]]))},
+        "t3_acc": {"mean": float(np.mean([r["t3_acc"] for r in all_results["Joint"]])),
+                   "std":  float(np.std( [r["t3_acc"] for r in all_results["Joint"]]))},
     }
     print(f"  Joint Training (UB):")
     for k, v in joint_summary.items():
@@ -277,12 +286,18 @@ def main():
         name: summary for name, summary in all_summaries.items()
         if name != "HypergraphEWC"
     }
+    jt_t1  = joint_summary.get("t1_acc", {"mean": 0.0, "std": 0.0})
+    jt_t2  = joint_summary.get("t2_acc", {"mean": 0.0, "std": 0.0})
+    jt_t3  = joint_summary.get("t3_acc", {"mean": 0.0, "std": 0.0})
+    jt_avg = (jt_t1["mean"] + jt_t2["mean"] + jt_t3["mean"]) / 3
     plot_summaries["Joint (UB)"] = {
-        "forgetting": {"mean": 0.0, "std": 0.0},
-        "recovery_ratio": {"mean": 1.0, "std": 0.0},
-        "plasticity": joint_summary.get("t2_acc", {"mean": 0.0, "std": 0.0}),
-        "A_2_1": joint_summary.get("t1_acc", {"mean": 0.0, "std": 0.0}),
-        "A_2_2": joint_summary.get("t2_acc", {"mean": 0.0, "std": 0.0}),
+        "avg_forgetting":  {"mean": 0.0,    "std": 0.0},
+        "recovery_ratio":  {"mean": 1.0,    "std": 0.0},
+        "plasticity":      jt_t3,
+        "avg_final_acc":   {"mean": jt_avg, "std": 0.0},
+        "A_3_1":           jt_t1,
+        "A_3_2":           jt_t2,
+        "A_3_3":           jt_t3,
     }
 
     plot_results(plot_summaries, FULL_DIR / "method_comparison.png",

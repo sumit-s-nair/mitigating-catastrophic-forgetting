@@ -50,27 +50,30 @@ BASELINE_DIR.mkdir(parents=True, exist_ok=True)
 # ─── Plotting ────────────────────────────────────────────────────────────────
 
 def _plot_training_curves(all_results, save_dir):
-    """Training curves for the naive sequential experiment."""
-    fig, axes = plt.subplots(1, 3, figsize=(18, 5))
+    """Training curves (loss + per-task accuracy) for the naive sequential experiment."""
+    fig, axes = plt.subplots(1, 4, figsize=(24, 5))
     E = config.EPOCHS_PER_TASK
-    all_epochs = list(range(1, 2 * E + 1))
+    all_epochs = list(range(1, 3 * E + 1))
 
     runs = all_results["finetune"]
-    all_loss = np.array([r["history"]["loss"] for r in runs])
-    all_t1 = np.array([r["history"]["t1_acc"] for r in runs])
-    all_t2 = np.array([r["history"]["t2_acc"] for r in runs])
+    all_loss = np.array([r["history"]["loss"]   for r in runs])
+    all_t1   = np.array([r["history"]["t1_acc"] for r in runs])
+    all_t2   = np.array([r["history"]["t2_acc"] for r in runs])
+    all_t3   = np.array([r["history"]["t3_acc"] for r in runs])
 
     for ax, arr, color, title, ylabel in [
-        (axes[0], all_loss, "#e74c3c", "Training Loss", "Loss"),
-        (axes[1], all_t1, "#2ecc71", "T1 (Python) Accuracy", "Accuracy"),
-        (axes[2], all_t2, "#3498db", "T2 (JS) Accuracy", "Accuracy"),
+        (axes[0], all_loss, "#e74c3c", "Training Loss",         "Loss"),
+        (axes[1], all_t1,   "#2ecc71", "T1 (Python) Accuracy",  "Accuracy"),
+        (axes[2], all_t2,   "#3498db", "T2 (JS) Accuracy",      "Accuracy"),
+        (axes[3], all_t3,   "#9b59b6", "T3 (Politics) Accuracy","Accuracy"),
     ]:
         mean, std = arr.mean(axis=0), arr.std(axis=0)
         ax.plot(all_epochs, mean, "-", color=color, linewidth=2)
         ax.fill_between(all_epochs, mean - std, mean + std, alpha=0.2, color=color)
-        ax.axvline(x=E + 0.5, color="gray", linestyle="--", alpha=0.7, label="Task switch")
+        ax.axvline(x=E + 0.5,     color="gray", linestyle="--", alpha=0.7, label="T1→T2")
+        ax.axvline(x=2 * E + 0.5, color="gray", linestyle=":",  alpha=0.7, label="T2→T3")
         ax.set_xlabel("Epoch"); ax.set_ylabel(ylabel); ax.set_title(title)
-        ax.legend(); ax.grid(True, alpha=0.3)
+        ax.legend(fontsize=8); ax.grid(True, alpha=0.3)
         if "Accuracy" in ylabel:
             ax.set_ylim(0, 1.05)
 
@@ -82,35 +85,41 @@ def _plot_training_curves(all_results, save_dir):
 
 
 def _plot_forgetting_viz(all_results, save_dir):
-    """Forgetting visualization with curves."""
+    """Forgetting visualization: T1/T2/T3 accuracy across all 3 task epochs."""
     runs = all_results["finetune"]
-    fig, ax = plt.subplots(figsize=(10, 6))
+    fig, ax = plt.subplots(figsize=(12, 6))
     E = config.EPOCHS_PER_TASK
-    all_epochs = list(range(1, 2 * E + 1))
+    all_epochs = list(range(1, 3 * E + 1))
 
     all_t1 = np.array([r["history"]["t1_acc"] for r in runs])
     all_t2 = np.array([r["history"]["t2_acc"] for r in runs])
+    all_t3 = np.array([r["history"]["t3_acc"] for r in runs])
     t1_mean, t1_std = all_t1.mean(0), all_t1.std(0)
     t2_mean, t2_std = all_t2.mean(0), all_t2.std(0)
+    t3_mean, t3_std = all_t3.mean(0), all_t3.std(0)
 
     ax.fill_between(all_epochs, t1_mean - t1_std, t1_mean + t1_std, alpha=0.15, color="#2ecc71")
     ax.fill_between(all_epochs, t2_mean - t2_std, t2_mean + t2_std, alpha=0.15, color="#3498db")
+    ax.fill_between(all_epochs, t3_mean - t3_std, t3_mean + t3_std, alpha=0.15, color="#9b59b6")
     ax.plot(all_epochs, t1_mean, "-", color="#2ecc71", linewidth=2.5, label="T1 (Python)")
     ax.plot(all_epochs, t2_mean, "-", color="#3498db", linewidth=2.5, label="T2 (JS)")
+    ax.plot(all_epochs, t3_mean, "-", color="#9b59b6", linewidth=2.5, label="T3 (Politics)")
 
-    r1_t1 = t1_mean[E - 1]
-    r2_t1 = t1_mean[-1]
-    fgt = r1_t1 - r2_t1
+    r1_t1 = t1_mean[E - 1]   # T1 acc right after T1 training
+    r3_t1 = t1_mean[-1]       # T1 acc after all 3 tasks
+    fgt   = r1_t1 - r3_t1
 
-    ax.annotate("", xy=(E + 1, r2_t1), xytext=(E, r1_t1),
+    ax.annotate("", xy=(3 * E - 2, r3_t1), xytext=(E, r1_t1),
                 arrowprops=dict(arrowstyle="->", color="#e74c3c", lw=2.5))
-    ax.annotate(f"Forgetting\n{fgt*100:.1f}%",
-                xy=(E + 5, (r1_t1 + r2_t1) / 2),
-                fontsize=13, color="#e74c3c", fontweight="bold")
+    ax.annotate(f"T1 Forgetting\n{fgt*100:.1f}%",
+                xy=(2 * E, (r1_t1 + r3_t1) / 2),
+                fontsize=12, color="#e74c3c", fontweight="bold")
 
-    ax.axvline(x=E + 0.5, color="gray", linestyle="--", alpha=0.7)
-    ax.text(E / 2, 1.08, "Task 1\n(Python)", ha="center", fontsize=11)
-    ax.text(E + E / 2, 1.08, "Task 2\n(JS)", ha="center", fontsize=11)
+    ax.axvline(x=E + 0.5,     color="gray", linestyle="--", alpha=0.7)
+    ax.axvline(x=2 * E + 0.5, color="gray", linestyle=":",  alpha=0.7)
+    ax.text(E / 2,           1.08, "Task 1\n(Python)",   ha="center", fontsize=11)
+    ax.text(E + E / 2,       1.08, "Task 2\n(JS)",       ha="center", fontsize=11)
+    ax.text(2 * E + E / 2,   1.08, "Task 3\n(Politics)", ha="center", fontsize=11)
 
     ax.set_xlabel("Epoch", fontsize=12)
     ax.set_ylabel("Test Accuracy", fontsize=12)
@@ -125,30 +134,31 @@ def _plot_forgetting_viz(all_results, save_dir):
 
 
 def _plot_accuracy_comparison(all_results, save_dir):
-    """Per-subreddit bar chart: after T1 vs after T2 vs Joint."""
+    """Per-subreddit bar chart: after T1 vs after T3 (final) vs Joint."""
     runs_ft = all_results["finetune"]
     runs_jt = all_results["joint"]
     subs = list(config.SUBREDDITS.keys())
 
-    fig, ax = plt.subplots(figsize=(12, 7))
+    fig, ax = plt.subplots(figsize=(14, 7))
     x_pos = np.arange(len(subs))
     width = 0.25
 
     r1_m = [np.mean([r["r1_per_class"][s] for r in runs_ft]) for s in subs]
-    r1_s = [np.std([r["r1_per_class"][s] for r in runs_ft]) for s in subs]
-    r2_m = [np.mean([r["r2_per_class"][s] for r in runs_ft]) for s in subs]
-    r2_s = [np.std([r["r2_per_class"][s] for r in runs_ft]) for s in subs]
-    jt_m = [np.mean([r["per_class"][s] for r in runs_jt]) for s in subs]
-    jt_s = [np.std([r["per_class"][s] for r in runs_jt]) for s in subs]
+    r1_s = [np.std( [r["r1_per_class"][s] for r in runs_ft]) for s in subs]
+    r3_m = [np.mean([r["r3_per_class"][s] for r in runs_ft]) for s in subs]
+    r3_s = [np.std( [r["r3_per_class"][s] for r in runs_ft]) for s in subs]
+    jt_m = [np.mean([r["per_class"][s]    for r in runs_jt]) for s in subs]
+    jt_s = [np.std( [r["per_class"][s]    for r in runs_jt]) for s in subs]
 
     ax.bar(x_pos - width, r1_m, width, yerr=r1_s, capsize=3,
-           label="After T1 (Python)", color="#2ecc71", edgecolor="white")
-    ax.bar(x_pos, r2_m, width, yerr=r2_s, capsize=3,
-           label="After T2 (JS finetune)", color="#e74c3c", edgecolor="white")
-    ax.bar(x_pos + width, jt_m, width, yerr=jt_s, capsize=3,
-           label="Joint (upper bound)", color="#3498db", edgecolor="white")
+           label="After T1 (Python)",        color="#2ecc71", edgecolor="white")
+    ax.bar(x_pos,          r3_m, width, yerr=r3_s, capsize=3,
+           label="After T3 (final finetune)", color="#e74c3c", edgecolor="white")
+    ax.bar(x_pos + width,  jt_m, width, yerr=jt_s, capsize=3,
+           label="Joint (upper bound)",       color="#3498db", edgecolor="white")
 
-    ax.axvline(x=2.5, color="gray", linestyle="--", alpha=0.5)
+    ax.axvline(x=2.5, color="gray", linestyle="--", alpha=0.5)  # T1 | T2
+    ax.axvline(x=5.5, color="gray", linestyle=":",  alpha=0.5)  # T2 | T3
     ax.set_title("HGNN Baseline — Per-Subreddit Accuracy",
                  fontsize=13, fontweight="bold")
     ax.set_xlabel("Subreddit")
@@ -233,9 +243,10 @@ def main():
         all_results["finetune"].append(result_ft)
 
         m = result_ft["metrics"]
-        print(f"    → T1 Acc: {result_ft['r2_t1_acc']:.4f}  "
-              f"T2 Acc: {result_ft['r2_t2_acc']:.4f}  "
-              f"Forgetting: {m['forgetting']:.4f}")
+        print(f"    → T1: {result_ft['r3_t1_acc']:.4f}  "
+              f"T2: {result_ft['r3_t2_acc']:.4f}  "
+              f"T3: {result_ft['r3_t3_acc']:.4f}  "
+              f"Avg Fgt: {m['avg_forgetting']:.4f}")
 
         # ─── Joint Training ──────────────────────────────────────
         print(f"\n  [2/2] Joint Training (upper bound)...")
@@ -246,7 +257,7 @@ def main():
         )
         result_jt = run_joint_training(model_jt, data, class_weights, config, seed)
         all_results["joint"].append(result_jt)
-        print(f"    → T1: {result_jt['t1_acc']:.4f}  T2: {result_jt['t2_acc']:.4f}")
+        print(f"    → T1: {result_jt['t1_acc']:.4f}  T2: {result_jt['t2_acc']:.4f}  T3: {result_jt['t3_acc']:.4f}")
 
     # ─── Aggregate ───────────────────────────────────────────────
     print(f"\n{'='*60}")
@@ -258,9 +269,11 @@ def main():
 
     jt_summary = {
         "t1_acc": {"mean": float(np.mean([r["t1_acc"] for r in all_results["joint"]])),
-                   "std": float(np.std([r["t1_acc"] for r in all_results["joint"]]))},
+                   "std":  float(np.std( [r["t1_acc"] for r in all_results["joint"]]))},
         "t2_acc": {"mean": float(np.mean([r["t2_acc"] for r in all_results["joint"]])),
-                   "std": float(np.std([r["t2_acc"] for r in all_results["joint"]]))},
+                   "std":  float(np.std( [r["t2_acc"] for r in all_results["joint"]]))},
+        "t3_acc": {"mean": float(np.mean([r["t3_acc"] for r in all_results["joint"]])),
+                   "std":  float(np.std( [r["t3_acc"] for r in all_results["joint"]]))},
     }
 
     print("  Finetune (No Mitigation):")

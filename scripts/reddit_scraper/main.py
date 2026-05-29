@@ -524,8 +524,16 @@ def main() -> None:
     selected_posts_this_run = 0
     posts_with_new_comments = 0
 
+    MAX_COMMENT_NODES = 8000
+
     try:
-        for post in iter_unprocessed_posts(subreddit=target_subreddit, processed_post_ids=processed_post_ids):
+        if len(known_comment_ids) >= MAX_COMMENT_NODES:
+            print(f"Already reached the comment cap of {MAX_COMMENT_NODES} (have {len(known_comment_ids)}). Skipping fetch.")
+            iterator = []
+        else:
+            iterator = iter_unprocessed_posts(subreddit=target_subreddit, processed_post_ids=processed_post_ids)
+
+        for post in iterator:
             selected_post_id = str(post.get("id", ""))
             selected_post_id = selected_post_id if selected_post_id.startswith("t3_") else f"t3_{selected_post_id}"
             selected_title = str(post.get("title", "") or "")
@@ -563,7 +571,12 @@ def main() -> None:
             known_comment_ids.update(new_comments_df["id"].astype(str).tolist())
             new_comment_frames.append(new_comments_df)
 
-        print(f"No more unprocessed posts found in r/{target_subreddit}.")
+            if len(known_comment_ids) >= MAX_COMMENT_NODES:
+                print(f"\nReached comment cap of {MAX_COMMENT_NODES} ({len(known_comment_ids)} collected). Stopping fetch.")
+                break
+
+        if iterator and len(known_comment_ids) < MAX_COMMENT_NODES:
+            print(f"No more unprocessed posts found in r/{target_subreddit}.")
     except KeyboardInterrupt:
         print("Interrupted by user. Checked post progress has been saved.")
 

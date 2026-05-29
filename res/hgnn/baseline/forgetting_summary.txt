@@ -1,5 +1,5 @@
 =================================================================
-HGNN NODE CLASSIFICATION â€” CATASTROPHIC FORGETTING BASELINE
+HGNN NODE CLASSIFICATION — CATASTROPHIC FORGETTING BASELINE
 =================================================================
 
 CONFIGURATION
@@ -13,19 +13,28 @@ CONFIGURATION
 
 NAIVE SEQUENTIAL (FINETUNE)
 ----------------------------------------
-            forgetting: 0.9055 Â± 0.0047
-     backward_transfer: -0.9055 Â± 0.0047
-      forward_transfer: 0.0000 Â± 0.0000
-        recovery_ratio: 0.0021 Â± 0.0008
-            plasticity: 0.7195 Â± 0.0268
-                 A_1_1: 0.9074 Â± 0.0042
-                 A_1_2: 0.0000 Â± 0.0000
-                 A_2_1: 0.0019 Â± 0.0008
-                 A_2_2: 0.7195 Â± 0.0268
+         t1_forgetting: 0.7923 ± 0.0267
+         t2_forgetting: 0.4798 ± 0.0315
+        avg_forgetting: 0.6360 ± 0.0134
+     backward_transfer: -0.6360 ± 0.0134
+      forward_transfer: 0.0000 ± 0.0000
+        recovery_ratio: 0.0000 ± 0.0000
+            plasticity: 0.3078 ± 0.0965
+         avg_final_acc: 0.1139 ± 0.0233
+                 A_1_1: 0.7923 ± 0.0267
+                 A_1_2: 0.0000 ± 0.0000
+                 A_1_3: 0.0000 ± 0.0000
+                 A_2_1: 0.0000 ± 0.0000
+                 A_2_2: 0.5135 ± 0.0152
+                 A_2_3: 0.0000 ± 0.0000
+                 A_3_1: 0.0000 ± 0.0000
+                 A_3_2: 0.0337 ± 0.0294
+                 A_3_3: 0.3078 ± 0.0965
 
 JOINT TRAINING (UPPER BOUND)
 ----------------------------------------
-                t1_acc: 0.9106 Â± 0.0054
-                t2_acc: 0.8808 Â± 0.0070
+                t1_acc: 0.7940 ± 0.0012
+                t2_acc: 0.7082 ± 0.0080
+                t3_acc: 0.6093 ± 0.0056
 
 =================================================================

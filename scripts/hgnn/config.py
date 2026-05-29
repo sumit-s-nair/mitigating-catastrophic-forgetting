@@ -22,17 +22,22 @@ SUBREDDITS = {
     "javascript": 3,
     "node": 4,
     "webdev": 5,
+    "politics": 6,
+    "geopolitics": 7,
+    "worldnews": 8
 }
 LABEL_NAMES = {v: k for k, v in SUBREDDITS.items()}
-NUM_CLASSES = 6
+NUM_CLASSES = 9
 
-# Task split: T1 = Python ecosystem, T2 = JavaScript ecosystem
+# Task split: T1 = Python ecosystem, T2 = JavaScript ecosystem, T3 = Politics
 TASK_SPLIT = {
     "T1": [0, 1, 2],  # python, learnpython, django
     "T2": [3, 4, 5],  # javascript, node, webdev
+    "T3": [6, 7, 8],  # politics, geopolitics, worldnews
 }
 T1_LABELS = TASK_SPLIT["T1"]
 T2_LABELS = TASK_SPLIT["T2"]
+T3_LABELS = TASK_SPLIT["T3"]
 ALL_LABELS = list(range(NUM_CLASSES))
 
 # ─── Hypergraph Construction ────────────────────────────────────────────────
