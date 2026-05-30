@@ -182,14 +182,16 @@ def plot_results(results_dict: Dict[str, dict], save_path: Path,
 
 def plot_forgetting_curves(histories: Dict[str, dict], save_path: Path,
                            epochs_per_task: int = 50,
-                           upper_bound: Optional[float] = None) -> None:
-    """Overlay T1 accuracy curves for multiple methods.
+                           upper_bound: Optional[float] = None,
+                           target_task: str = "T1") -> None:
+    """Overlay accuracy curves for a specific task across multiple methods.
 
     Args:
         histories: {method_name: {"t1_acc": [list], "t2_acc": [list]}}
         save_path: where to save
         epochs_per_task: number of epochs per task
         upper_bound: optional horizontal reference line (e.g., joint-training T1 acc)
+        target_task: 'T1' or 'T2'
     """
     E = epochs_per_task
     all_epochs = list(range(1, 3 * E + 1))
@@ -198,9 +200,13 @@ def plot_forgetting_curves(histories: Dict[str, dict], save_path: Path,
     colors = plt.cm.tab10(np.linspace(0, 1, len(histories)))
 
     for i, (name, h) in enumerate(histories.items()):
-        t1_curve = h.get("t1_acc", [])
-        if len(t1_curve) == 3 * E:
-            ax.plot(all_epochs, t1_curve, "-", color=colors[i],
+        if target_task == "T1":
+            curve = h.get("t1_acc", [])
+        else:
+            curve = h.get("t2_acc", [])
+            
+        if len(curve) == 3 * E:
+            ax.plot(all_epochs, curve, "-", color=colors[i],
                     linewidth=2, label=name)
 
     if upper_bound is not None:
@@ -214,8 +220,8 @@ def plot_forgetting_curves(histories: Dict[str, dict], save_path: Path,
     ax.text(2 * E + E / 2, 1.05, "Task 3\n(Politics)", ha="center", fontsize=11)
 
     ax.set_xlabel("Epoch", fontsize=13)
-    ax.set_ylabel("T1 Accuracy", fontsize=13)
-    ax.set_title("Forgetting Curves — All Methods", fontsize=15, fontweight="bold")
+    ax.set_ylabel(f"{target_task} Accuracy", fontsize=13)
+    ax.set_title(f"Forgetting Curves ({target_task}) — All Methods", fontsize=15, fontweight="bold")
     ax.set_ylim(0, 1.12)
     ax.legend(loc="center left", bbox_to_anchor=(1.02, 0.5), fontsize=9)
     ax.grid(True, alpha=0.3)
