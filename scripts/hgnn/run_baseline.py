@@ -65,7 +65,7 @@ def _plot_training_curves(all_results, save_dir):
         (axes[0], all_loss, "#e74c3c", "Training Loss",         "Loss"),
         (axes[1], all_t1,   "#2ecc71", "T1 (Python) Accuracy",  "Accuracy"),
         (axes[2], all_t2,   "#3498db", "T2 (JS) Accuracy",      "Accuracy"),
-        (axes[3], all_t3,   "#9b59b6", "T3 (Politics) Accuracy","Accuracy"),
+        (axes[3], all_t3,   "#9b59b6", "T3 (DevOps) Accuracy",  "Accuracy"),
     ]:
         mean, std = arr.mean(axis=0), arr.std(axis=0)
         ax.plot(all_epochs, mean, "-", color=color, linewidth=2)
@@ -103,7 +103,7 @@ def _plot_forgetting_viz(all_results, save_dir):
     ax.fill_between(all_epochs, t3_mean - t3_std, t3_mean + t3_std, alpha=0.15, color="#9b59b6")
     ax.plot(all_epochs, t1_mean, "-", color="#2ecc71", linewidth=2.5, label="T1 (Python)")
     ax.plot(all_epochs, t2_mean, "-", color="#3498db", linewidth=2.5, label="T2 (JS)")
-    ax.plot(all_epochs, t3_mean, "-", color="#9b59b6", linewidth=2.5, label="T3 (Politics)")
+    ax.plot(all_epochs, t3_mean, "-", color="#9b59b6", linewidth=2.5, label="T3 (DevOps)")
 
     r1_t1 = t1_mean[E - 1]   # T1 acc right after T1 training
     r3_t1 = t1_mean[-1]       # T1 acc after all 3 tasks
@@ -119,7 +119,7 @@ def _plot_forgetting_viz(all_results, save_dir):
     ax.axvline(x=2 * E + 0.5, color="gray", linestyle=":",  alpha=0.7)
     ax.text(E / 2,           1.08, "Task 1\n(Python)",   ha="center", fontsize=11)
     ax.text(E + E / 2,       1.08, "Task 2\n(JS)",       ha="center", fontsize=11)
-    ax.text(2 * E + E / 2,   1.08, "Task 3\n(Politics)", ha="center", fontsize=11)
+    ax.text(2 * E + E / 2,   1.08, "Task 3\n(DevOps)",   ha="center", fontsize=11)
 
     ax.set_xlabel("Epoch", fontsize=12)
     ax.set_ylabel("Test Accuracy", fontsize=12)

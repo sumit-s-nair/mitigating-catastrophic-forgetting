@@ -8,7 +8,7 @@ HypergraphCLTrainer handles the full T1→T2→T3 continual learning protocol:
   4. Train on T2 (JS subreddits) for EPOCHS_PER_TASK epochs
   5. Call CL method’s after_task("T2") hook
   6. Call CL method’s before_task("T3") hook for T3
-  7. Train on T3 (Politics subreddits) for EPOCHS_PER_TASK epochs
+  7. Train on T3 (DevOps subreddits) for EPOCHS_PER_TASK epochs
   8. Evaluate on all three tasks after each task
 
 Hypergraph-specific notes:
@@ -209,7 +209,7 @@ class HypergraphCLTrainer:
         self.cl_method.after_task("T2", data, self.model)
 
         # ─── Task 3 ────────────────────────────────────────────
-        print(f"\n  Training Task 3 (Politics subreddits)...")
+        print(f"\n  Training Task 3 (DevOps subreddits)...")
         self.cl_method.before_task("T3", data, self.model)
         h3 = self.train_task("T3", data, class_weights)
 

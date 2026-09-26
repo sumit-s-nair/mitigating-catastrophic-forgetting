@@ -22,18 +22,18 @@ SUBREDDITS = {
     "javascript": 3,
     "node": 4,
     "webdev": 5,
-    "politics": 6,
-    "geopolitics": 7,
-    "worldnews": 8
+    "devops": 6,
+    "sysadmin": 7,
+    "linux": 8
 }
 LABEL_NAMES = {v: k for k, v in SUBREDDITS.items()}
 NUM_CLASSES = 9
 
-# Task split: T1 = Python ecosystem, T2 = JavaScript ecosystem, T3 = Politics
+# Task split: T1 = Python ecosystem, T2 = JavaScript ecosystem, T3 = DevOps/SysAdmin ecosystem
 TASK_SPLIT = {
     "T1": [0, 1, 2],  # python, learnpython, django
     "T2": [3, 4, 5],  # javascript, node, webdev
-    "T3": [6, 7, 8],  # politics, geopolitics, worldnews
+    "T3": [6, 7, 8],  # devops, sysadmin, linux
 }
 T1_LABELS = TASK_SPLIT["T1"]
 T2_LABELS = TASK_SPLIT["T2"]

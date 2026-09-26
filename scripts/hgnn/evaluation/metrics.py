@@ -217,7 +217,7 @@ def plot_forgetting_curves(histories: Dict[str, dict], save_path: Path,
     ax.axvline(x=2 * E + 0.5, color="gray", linestyle=":", alpha=0.7)
     ax.text(E / 2, 1.05, "Task 1\n(Python)", ha="center", fontsize=11)
     ax.text(E + E / 2, 1.05, "Task 2\n(JS)", ha="center", fontsize=11)
-    ax.text(2 * E + E / 2, 1.05, "Task 3\n(Politics)", ha="center", fontsize=11)
+    ax.text(2 * E + E / 2, 1.05, "Task 3\n(DevOps)", ha="center", fontsize=11)
 
     ax.set_xlabel("Epoch", fontsize=13)
     ax.set_ylabel(f"{target_task} Accuracy", fontsize=13)

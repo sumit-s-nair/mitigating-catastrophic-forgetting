@@ -209,3 +209,6 @@ __marimo__/
 data/
 output/
 .vscode/
+
+# Reddit session cookies for the scraper — credentials, never commit
+cookies.txt
